@@ -1,0 +1,59 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Sep 25 22:05:20 2023
+
+@author: stian
+"""
+
+#Henter inn koden "lister_for_del_1.py
+temperaturer = [-5, 2, 6, 13, 9, 22, 28, 19, 24, 12, 5, 1, -3, -8, 2, 8, 15, 18, 21, 26, 21, 31, 15, 4, 1, -2]
+dogn_nedbor = [2, 5, 0, 0, 0, 3, 6, 4, 0, 0, 5, 0, 12, 12, 12, 12, 7, 19]
+
+temperaturer_tidspunkter = list()
+for index in range(len(temperaturer)):
+    temperaturer_tidspunkter.append(index)
+
+#Definerer inputer
+i_input = 2
+n_input = 10
+x_koordinater = temperaturer 
+y_koordinater = temperaturer_tidspunkter 
+
+#Funksjon for a
+def a(i, n, x, y):
+    summert_a = 0 
+    summert_a_over = 0 
+    summert_a_under = 0 
+    avg_x = sum(x)/len(x) 
+    avg_y = sum(y)/len(y)  
+    for a in range(n + 1):
+        summert_a_over += ((x[0]-avg_x)*(x[0]-avg_y)) 
+        summert_a_under += (x[0]-avg_x)**2 
+        summert_a = summert_a_over / summert_a_under 
+    return summert_a
+
+
+resultat_a = a(i_input, n_input, x_koordinater, y_koordinater)
+
+
+#Funksjon for b
+def b(a, x, y):
+    summert_b = 0
+    avg_x = sum(x)/len(x)
+    avg_y = sum(y)/len(y)
+    summert_b = avg_y-a*avg_x
+    return summert_b
+
+
+resultat_b = b(resultat_a, x_koordinater, y_koordinater)
+
+
+#Printer resulateter + om trend er stigende eller synkende
+print(f"a={resultat_a}")
+print(f"b={resultat_b}")
+if resultat_a >0:
+    print("Temperaturtrenden er stigende")
+if resultat_a <0:
+    print("Temperaturtrenden er synkende"),
+if resultat_a ==0:
+    print("Ingen temperaturtrend")
