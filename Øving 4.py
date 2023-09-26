@@ -57,7 +57,7 @@ def liner_reg(x,y,n):
 def trend(x,a,b): 
     verdi=[]
     for i  in range (len(x)):
-        a.append(a*x[i]+b)
+        verdi.append(a*x[i]+b)
     return verdi
     
 
