@@ -50,4 +50,14 @@ def liner_reg(x,y,n):
     a= sum_above/sum_under
     b=average_y - (a*average_x)
     return a,b
-       
+
+#a,b= liner_reg(x,y,n)
+#funksjon som regner ut verdi
+
+def trend(x,a,b): 
+    verdi=[]
+    for i  in range (len(x)):
+        a.append(a*x[i]+b)
+    return verdi
+    
+
