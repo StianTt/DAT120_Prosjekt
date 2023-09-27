@@ -1,23 +1,38 @@
-#oppgave d
+import matplotlib.pyplot as plt
 
+temperaturer = [-5, 2, 6, 13, 9, 22, 28, 19, 24, 12, 5, 1, -3, -8, 2, 8, 15, 18,
+21, 26, 21, 31, 15, 4, 1, -2]
+dogn_nedbor = [2, 5, 0, 0, 0, 3, 6, 4, 0, 0, 5, 0, 12, 12, 12, 12, 7, 19]
+
+#oppgave d,i
 def antal_elem_storre_eller_lik(x,y):
+    sum=0
     for i in x:
         if i >= y:
-            print (i)
-#oppgave e
-def differansen_mellom_neste_og_siste(x):
+            sum+=1
+    return sum
+print(antal_elem_storre_eller_lik(temperaturer,20),"dager over 20")
+print(antal_elem_storre_eller_lik(temperaturer,25),"dager over 25")
+print(antal_elem_storre_eller_lik(temperaturer,30),"dager over 30")
+
+#oppgave e,j
+def differansen_mellom_neste_og_siste(x,a):
     v=[]
+    index_liste=[]
     for i in range (len(x)-1):
-        v.append(x[i]-x[len(x)-1])
-    return v
+        v.append(x[i+1]-x[i])
+    
+    for i in range (len(v)):
+        index_liste.append(i)        
+        if v[i] <a:
+            print(i," Synkende")
+        elif v[i] ==a:
+            print(i," Uforandret")
+        else:
+            print(i, " Stigende")
+    return  index_liste
 
-#oppgave e.a frivillig 1
-
-#def numeriske_deriverte(x,y,h):
-   # l=[]
-   # for i in range (len (x)):
-       # der=()/h
-
+differansen_mellom_neste_og_siste(temperaturer,0)
 
 #oppgave f
 def sammenhengende_sekvensen(x):
@@ -50,14 +65,34 @@ def liner_reg(x,y,n):
     a= sum_above/sum_under
     b=average_y - (a*average_x)
     return a,b
-
-#a,b= liner_reg(x,y,n)
-#funksjon som regner ut verdi
-
+ 
 def trend(x,a,b): 
     verdi=[]
     for i  in range (len(x)):
-        verdi.append(a*x[i]+b)
+        a.append(a*x[i]+b)
     return verdi
-    
 
+#oppgave h
+def sorted_storre_enn_5(z):
+    # Sort the list 'z' in ascending order
+    z.sort()  # Remove the assignment to 'z' here
+    
+    storage = []
+    
+    # Iterate through the sorted list
+    for i in z:  # No runtime error on this line after fixing the sorting
+        if i > 5:
+            # Check if the number 'i' is already in storage
+            found = False
+            for item in storage:
+                if item[0] == i:
+                    # If it's in storage, increment the count (item[1])
+                    item[1] += 1
+                    found = True
+                    break
+            
+            # If not in storage, add it as [i, 1]
+            if not found:
+                storage.append([i, 1])
+    
+    return storage
