@@ -1,0 +1,74 @@
+@author: EFuraas
+"""
+# Oppgave D
+def tell_temperaturintervall(liste, nedre_grense, øvre_grense):
+    antall_dager = 0
+    for temperatur in liste:
+        if nedre_grense <= temperatur < øvre_grense:
+            antall_dager += 1
+    return antall_dager
+
+temperaturer = [-5, 2, 6, 13, 9, 22, 28, 19, 24, 12, 5, 1, -3, -8, 2, 8, 15, 18,
+21, 26, 21, 31, 15, 4, 1, -2]
+
+sommerdager = tell_temperaturintervall(temperaturer, 20, 25)
+høy_sommerdager = tell_temperaturintervall(temperaturer, 25, 30)
+tropedager = tell_temperaturintervall(temperaturer, 30, float('inf'))
+
+print(f"Antall sommerdager (20-25 grader): {sommerdager}")
+print(f"Antall høysommerdager (25-30 grader): {høy_sommerdager}")
+print(f"Antall tropedager (>= 30 grader): {tropedager}")
+
+
+def finn_temperatur_trend(temperaturer):
+    trend = []
+    for i in range(len(temperaturer) - 1):
+        differanse = temperaturer[i + 1] - temperaturer[i]
+        if differanse > 0:
+            trend.append("stigende")
+        elif differanse < 0:
+            trend.append("synkende")
+        else:
+            trend.append("uforandret")
+    return trend
+
+temperaturer = [-5, 2, 6, 13, 9, 22, 28, 19, 24, 12, 5, 1, -3, -8, 2, 8, 15, 18,
+21, 26, 21, 31, 15, 4, 1, -2]
+
+temperatur_trend = finn_temperatur_trend(temperaturer)
+
+for i, trend in enumerate(temperatur_trend):
+    print(f"Indeks {i}: {trend}")
+
+
+def lengste_null_sekvens(liste):
+    maks_lengde = 0
+    gjeldende_lengde = 0
+
+    for tall in liste:
+        if tall == 0:
+            gjeldende_lengde += 1
+            maks_lengde = max(maks_lengde, gjeldende_lengde)
+        else:
+            gjeldende_lengde = 0
+
+    return maks_lengde
+
+dogn_nedbor = [2, 5, 0, 0, 0, 3, 6, 4, 0, 0, 5, 0, 12, 12, 12, 12, 7, 19]
+lengde = lengste_null_sekvens(dogn_nedbor)
+print(f"Lengden til den lengste perioden uten nedbør er: {lengde}")
+
+
+def beregn_plantevekst(temp_liste):
+    total_vekst = 0
+    for temperatur in temp_liste:
+        if temperatur > 5:
+            vekst = temperatur - 5
+            total_vekst += vekst
+    return total_vekst
+
+temperaturer = [-5, 2, 6, 13, 9, 22, 28, 19, 24, 12, 5, 1, -3, -8, 2, 8, 15, 18,
+21, 26, 21, 31, 15, 4, 1, -2]
+
+total_vekst = beregn_plantevekst(temperaturer)
+print(f"Summen av veksten er: {total_vekst}")
