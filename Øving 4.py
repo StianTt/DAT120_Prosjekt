@@ -23,16 +23,19 @@ def differansen_mellom_neste_og_siste(x,a):
         v.append(x[i+1]-x[i])
     
     for i in range (len(v)):
-        index_liste.append(i)        
+              
         if v[i] <a:
             print(i," Synkende")
         elif v[i] ==a:
             print(i," Uforandret")
         else:
             print(i, " Stigende")
+    for i in range (len(x)):
+        index_liste.append(i)
+       
     return  index_liste
 
-differansen_mellom_neste_og_siste(temperaturer,0)
+temperaturer_tidspunkter=differansen_mellom_neste_og_siste(temperaturer,0)
 
 #oppgave f
 def sammenhengende_sekvensen(x):
@@ -71,6 +74,7 @@ def trend(x,a,b):
     for i  in range (len(x)):
         a.append(a*x[i]+b)
     return verdi
+liner_reg(temperaturer,temperaturer_tidspunkter,len(temperaturer)-1)
 
 #oppgave h
 def sorted_storre_enn_5(z):
@@ -96,3 +100,5 @@ def sorted_storre_enn_5(z):
                 storage.append([i, 1])
     
     return storage
+
+sorted_storre_enn_5(temperaturer)
