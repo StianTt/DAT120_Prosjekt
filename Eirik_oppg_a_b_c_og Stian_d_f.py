@@ -1,0 +1,185 @@
+import csv
+from datetime import datetime
+import matplotlib.pyplot as plt
+
+# Define a function to read weather data from a CSV file
+def read_weather_data(filename):
+    data = {}
+    with open(filename, 'r') as file:
+        reader = csv.reader(file, delimiter=';')
+        next(reader)  # Skip the header row
+        for row in reader:
+            name, station_id, date_str, snow_depth_str, precipitation_str, temperature_str, cloud_cover_str, wind_speed_str, *_ = row
+            if not date_str:  # Check if date_str is an empty string
+                continue
+ #lagt til
+            try:
+                date = datetime.strptime(date_str, '%d.%m.%Y')
+            except ValueError:
+                print(f"Invalid date format for {date_str}. Skipping this row.")
+                continue
+#fortsettelse
+            if not date_str:  # Check if date_str is an empty string
+                continue
+            date = datetime.strptime(date_str, '%d.%m.%Y')
+            snow_depth = float(snow_depth_str.replace(',', '.')) if snow_depth_str != '-' else 0.0
+            precipitation = float(precipitation_str.replace(',', '.')) if precipitation_str != '-' else 0.0
+            temperature = float(temperature_str.replace(',', '.')) if temperature_str != '-' else 0.0
+            cloud_cover = float(cloud_cover_str.replace(',', '.')) if cloud_cover_str != '-' else 0.0  # Replace comma with period
+            wind_speed = float(wind_speed_str.replace(',', '.')) if wind_speed_str != '-' else 0.0
+
+            # Group data by year
+            year = date.year
+            if year not in data:
+                data[year] = {
+                    'name': name,
+                    'station_id': station_id,
+                    'years': {},
+                }
+            data[year]['years'][date] = {
+                'date': date,
+                'snow_depth': snow_depth,
+                'precipitation': precipitation,
+                'temperature': temperature,
+                'cloud_cover': cloud_cover,
+                'wind_speed': wind_speed,
+            }
+
+    return data
+
+def calculate_skiing_days(data):
+    skiing_data = []  # Store skiing days data for trend calculation
+    for year, year_data in data.items():
+        skiing_days = 0
+        year = int(year)  # Convert it to an integer
+        winter_start = datetime(year - 1, 10, 1)  # Winter season starts in October of the previous year
+        winter_end = datetime(year, 6, 30)  # Winter season ends in June of the current year
+
+        for date, daily_data in year_data['years'].items():
+            if winter_start <= date <= winter_end:
+                if daily_data['snow_depth'] >= 20:
+                    skiing_days += 1
+        print(f"Year {year}: {skiing_days} skiing days")
+        skiing_data.append(skiing_days)
+
+    return skiing_data
+
+# Define a function to calculate the trend for the number of skiing days
+def calculate_skiing_trend(data):
+    skiing_data = calculate_skiing_days(data)
+    
+    n = len(skiing_data)
+
+    def a(i, n, x, y):
+        avg_x = sum(x) / len(x)
+        avg_y = sum(y) / len(y)
+        summert_a_over = sum((x[i] - avg_x) * (y[i] - avg_y) for i in range(n))
+        summert_a_under = sum((x[i] - avg_x) ** 2 for i in range(n))
+        summert_a = summert_a_over / summert_a_under if summert_a_under != 0 else 0
+        return summert_a
+
+    def b(a, x, y):
+        avg_x = sum(x) / len(x)
+        avg_y = sum(y) / len(y)
+        summert_b = avg_y - a * avg_x
+        return summert_b
+
+    resultat_a = a(0, n, list(data.keys()), skiing_data)
+    resultat_b = b(resultat_a, list(data.keys()), skiing_data)
+
+    trend = "stigende" if resultat_a > 0 else "synkende" if resultat_a < 0 else "uforandret"
+
+    return resultat_a, resultat_b, trend
+
+# Prompt the user for the CSV file
+filename = input("Enter the CSV file name (e.g., weather_data.csv): ")
+
+# Read weather data from the specified CSV file
+weather_data = read_weather_data(filename)
+
+# Calculate skiing days and trend
+trend_a, trend_b, skiing_trend = calculate_skiing_trend(weather_data)
+
+# Print results
+print(f"Trend for skiing days (a value): {trend_a}")
+print(f"Intercept for skiing days (b value): {trend_b}")
+print(f"Skiing days trend: {skiing_trend}")
+
+
+#  Oppgave d
+"""Plott antall dager med skiføre for hver skisesong (fra oppgave b) og trend (fra oppgave c) i
+samme plott, med året skisesongen starter på x-aksen og antall dager med skiføre på y-
+aksen. For å plotte trenden, bruk formelen y = ax+b til å regne ut to punkter, ett for året
+datasettet starter og ett for året datasettet slutter. Inkluder bare år hvor det er data om
+snødybde for mesteparten av skisesongen, det må være data for minst 200 dager i hver
+skisesong."""
+
+#import matplotlib.pyplot as plt lagt til på toppen
+
+def plot_skifore_og_trend(data, trend_a, trend_b):
+    gyldige_aar = []
+    skifore = []
+
+    for year, year_data in data.items():
+        if 'years' not in year_data or len(year_data['years']) < 200:
+            continue
+
+        gyldige_aar.append(year)
+        skifore.append(sum(1 for daily_data in year_data['years'].values() if daily_data['snow_depth'] >= 20))
+
+    plt.scatter(gyldige_aar, skifore, label='Skiføre')
+    trend_line_start = trend_a * min(gyldige_aar) + trend_b
+    trend_line_end = trend_a * max(gyldige_aar) + trend_b
+    plt.plot([min(gyldige_aar), max(gyldige_aar)], [trend_line_start, trend_line_end], label='Trend Linje', linestyle='--')
+    plt.xlabel('Skisesong (år)')
+    plt.ylabel('Dager med skiføre')
+    plt.title('Antall dager med skiføre og trend')
+    plt.legend()
+    plt.show()
+
+plot_skifore_og_trend(weather_data, trend_a, trend_b)
+
+
+#Oppgave f
+"""Bruk funksjonen fra del 1 oppgave f) til å finne den lengste perioden med tørke (ingen
+nedbør) for hvert år i datasettet. Plott resultatet. Inkluder bare år hvor det er nedbørsdata
+for mesteparten av året, det må være data for minst 300 dager for at et år skal være gyldig."""
+
+#Henter funksjon fra del 1 av prosjektet
+def lengste_null_sekvens(liste):
+    maks_lengde = 0
+    gjeldende_lengde = 0
+
+    for tall in liste:
+        if tall == 0:
+            gjeldende_lengde += 1
+            maks_lengde = max(maks_lengde, gjeldende_lengde)
+        else:
+            gjeldende_lengde = 0
+
+    return maks_lengde
+
+def plot_lengste_null_sekvens(data):
+    gyldige_aar = []
+    lengste_torkeperiode = []
+
+    for year, year_data in data.items():
+        if len(year_data['years']) < 300:
+            continue
+
+        gyldige_aar.append(year)
+        precipitation_data = [daily_data['precipitation'] for daily_data in year_data['years'].values()]
+        lengste_torkeperiode.append(lengste_null_sekvens(precipitation_data))
+
+
+    plt.bar(gyldige_aar, lengste_torkeperiode, color='orange')
+    plt.xlabel('År')
+    plt.ylabel('Lengste tørkeperiode (Dager)')
+    plt.title('Lengste tørkeperiode hvert år')
+    plt.show()
+
+plot_lengste_null_sekvens(weather_data)
+
+
+
+
