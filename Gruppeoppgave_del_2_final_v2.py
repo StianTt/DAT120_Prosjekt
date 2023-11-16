@@ -343,37 +343,29 @@ plot_wind_stats(wind_stats)
 #Oppgave I
 from matplotlib.dates import date2num
 
-# Les CSV-filen
 with open(filename, 'r') as file:
     reader = csv.reader(file, delimiter=';')
-    header = next(reader)  # Les kolonnenavn
+    header = next(reader) 
 
-    # Fjern rader som ikke følger det forventede formatet og den siste raden
     data = [row for row in reader if len(row) >= 6 and row[0] != 'Data']
 
-# Håndter uvanlig datoformat med semikolon som separator
 dates = [row[2] for row in data]
 
-# Fjern rader der datoen ikke er tilgjengelig eller er ugyldig
 filtered_data = []
 for date, row in zip(dates, data):
     try:
         date_obj = datetime.strptime(date, '%d.%m.%Y')
         temp = row[5].replace(',', '.')
-        temp = float(temp)  # Konverter temperatur til flyttall
+        temp = float(temp)  
         filtered_data.append((date_obj, temp))
     except (ValueError, IndexError):
-        # Ugyldig datoformat eller ugyldig temperatur, ignorer raden
         print(f"Ugyldig data oppdaget: {row}")
 
-# Sjekk om det er data å behandle
 if not filtered_data:
     print("Ingen gyldig data tilgjengelig for behandling.")
 else:
-    # Separer datoer og temperaturer
     dates, temperatures = zip(*filtered_data)
 
-    # Lag en dictionary for å samle gjennomsnittstemperaturer per måned
     monthly_avg = {}
     for date, temp in zip(dates, temperatures):
         key = (date.year, date.month)
@@ -382,17 +374,13 @@ else:
         else:
             monthly_avg[key] = [temp]
 
-    # Sorter månedene riktig
     sorted_months = sorted(monthly_avg.keys())
 
-    # Hent gjennomsnittstemperaturer og differanser
     avg_temps = [sum(monthly_avg[key]) / len(monthly_avg[key]) for key in sorted_months]
     differences = [avg_temps[i] - avg_temps[i - 1] if i > 0 else 0 for i in range(len(avg_temps))]
 
-    # Konverter datoer til nummer for å bruke dem som x-akseverdier
     x_values = [date2num(datetime(year, month, 1)) for year, month in sorted_months]
 
-    # Lag et plott for gjennomsnittstemperaturer
     plt.figure(figsize=(12, 6))
     plt.subplot(2, 1, 1)
     plt.plot_date(x_values, avg_temps, '-o')
@@ -400,16 +388,13 @@ else:
     plt.xlabel('Måned og År')
     plt.ylabel('Gjennomsnittstemperatur (°C)')
 
-    # Lag et plott for differanser
     plt.subplot(2, 1, 2)
-    plt.plot_date(x_values[1:], differences[1:], '-o', color='r')  # Unngå første element i differanser
+    plt.plot_date(x_values[1:], differences[1:], '-o', color='r')  
     plt.title('Differanser mellom påfølgende måneder')
     plt.xlabel('Måned og År')
     plt.ylabel('Differanse i temperatur (°C)')
 
-    # Juster layout for å unngå overlapp
     plt.tight_layout()
 
-    # Vis plottet
     plt.show()
 
